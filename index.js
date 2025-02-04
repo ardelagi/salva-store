@@ -49,7 +49,27 @@ const commandFolders = fs.readdirSync("./src/commands");
   }
   client.handleEvents(eventFiles, "./src/events");
   client.handleCommands(commandFolders, "./src/commands");
-  client.login(process.env.token);
+  async function connectWithRetry(maxAttempts = 5) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await client.login(process.env.token);
+        console.log("Successfully connected to Discord!");
+        return;
+      } catch (error) {
+        console.error(`Connection attempt ${attempt}/${maxAttempts} failed:`, error.message);
+        if (attempt === maxAttempts) {
+          console.error("Max retry attempts reached. Please check Discord's status and your token.");
+          throw error;
+        }
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
+      }
+    }
+  }
+
+  connectWithRetry().catch(error => {
+    console.error("Failed to start bot:", error.message);
+  });
 })();
 
 
