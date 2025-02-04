@@ -69,9 +69,21 @@ async function sendWebhookMessage(content) {
   }
 
   try {
-    await axios.post(webhookUrl, { content });
+    await axios.post(webhookUrl, { content }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 5000,
+      validateStatus: function (status) {
+        return status < 500; // Only treat 500+ errors as actual errors
+      },
+      maxRedirects: 5,
+      retry: 3,
+      retryDelay: 1000
+    });
   } catch (error) {
-    console.error("Error sending webhook message:", error);
+    console.error("Webhook Error:", error.message);
+    // Continue bot operation even if webhook fails
   }
 }
 
