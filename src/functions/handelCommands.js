@@ -1,57 +1,47 @@
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const fs = require("fs");
-const {
-  green,
-  yellow,
-  magenta,
-  cyan,
-  red,
-  blue,
-  magentaBright,
-  white,
-} = require("colorette");
-require("colors");
+const { red, green, cyan, white } = require("colorette");
 
 const clientId = process.env.DISCORD_CLIENT_ID;
 const guildId = process.env.DISCORD_SERVER_ID;
+const botToken = process.env.token;
 
 module.exports = (client) => {
   client.handleCommands = async (commandFolders, path) => {
     client.commandArray = [];
+
+    console.log(cyan("[CMDS] Loading commands..."));
+
     for (const folder of commandFolders) {
       const commandFiles = fs
         .readdirSync(`${path}/${folder}`)
         .filter((file) => file.endsWith(".js"));
+
       for (const file of commandFiles) {
-        const command = require(`../commands/${folder}/${file}`);
-        client.commands.set(command.data.name, command);
-        client.commandArray.push(command.data.toJSON());
+        try {
+          const command = require(`../commands/${folder}/${file}`);
+          client.commands.set(command.data.name, command);
+          client.commandArray.push(command.data.toJSON());
+          console.log(green(`[CMDS] Loaded command: ${command.data.name}`));
+        } catch (error) {
+          console.error(red(`[ERROR] Failed to load ${file}: ${error.message}`));
+        }
       }
     }
 
-    const rest = new REST({ version: "9" }).setToken(process.env.token);
+    const rest = new REST({ version: "9" }).setToken(botToken);
 
-    (async () => {
-      try {
-        console.log(
-        "[CMDS]".red +
-          ` Started refrshing ${client.commandArray.length} application ( / ) commands`
-      );
-        await rest.put(Routes.applicationCommands(clientId, guildId), {
-          body: client.commandArray,
-        });
-        console.log(
-        "[CMDS]".green +
-          ` Successfully ${client.commandArray.length} refreshed application ( / ) commands`
-      );
-      } catch (error) {
-        console.error(
-          `${red(`[${new Date().toLocaleTimeString()}]`)} ${white(
-            `Error: ${error.message}`
-          )}`
-        );
-      }
-    })();
+    try {
+      console.log(cyan(`[CMDS] Refreshing ${client.commandArray.length} commands...`));
+
+      await rest.put(Routes.applicationCommands(clientId), {
+        body: client.commandArray,
+      });
+
+      console.log(green("[CMDS] Successfully refreshed all application (/) commands"));
+    } catch (error) {
+      console.error(red(`[ERROR] Failed to refresh commands: ${error.message}`));
+    }
   };
 };

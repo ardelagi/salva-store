@@ -11,10 +11,12 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^18.0.6",
+    "axios": "^1.7.9",
     "colorette": "^2.0.20",
     "colors": "^1.4.0",
     "command.js": "^0.0.1",
     "discord.js": "^14.17.3",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
   }
 }

@@ -52,6 +52,63 @@ const commandFolders = fs.readdirSync("./src/commands");
   client.login(process.env.token);
 })();
 
+
+
+/* =================== Bot Monitoring =================== */
+
+
+require("dotenv").config();
+const axios = require("axios");
+
+const webhookUrl = process.env.WEBHOOK_URL;
+
+async function sendWebhookMessage(content) {
+  if (!webhookUrl) {
+    console.error("Webhook URL is not set in environment variables.");
+    return;
+  }
+
+  try {
+    await axios.post(webhookUrl, { content });
+  } catch (error) {
+    console.error("Error sending webhook message:", error);
+  }
+}
+
+
+client.once("ready", () => {
+  sendWebhookMessage(`✅ Bot **${client.user.tag}** is now online!`);
+});
+
+
+client.on("disconnect", () => {
+  sendWebhookMessage("⚠️ Bot has been disconnected from Discord!");
+});
+
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+  sendWebhookMessage(`❌ Bot mengalami error: \`${err.message}\``);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  sendWebhookMessage(`❌ Unhandled Rejection: \`${reason}\``);
+});
+
+
+process.on("exit", () => {
+  sendWebhookMessage("🔴 Bot is now offline!");
+});
+
+process.on("SIGTERM", () => {
+  sendWebhookMessage("🔴 Bot is shutting down!");
+  process.exit(0);
+});
+
+
+
+
 /* =================== Product Discord =================== */
 client.on(Events.InteractionCreate, async (interaction) => {
   if (
