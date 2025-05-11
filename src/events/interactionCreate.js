@@ -12,7 +12,7 @@ const {
 module.exports = {
   name: Events.InteractionCreate,
   async execute(interaction, client) {
-    // Handle Slash Commands
+    // Slash Command
     if (interaction.isChatInputCommand()) {
       const command = client.commands.get(interaction.commandName);
       if (!command) return;
@@ -21,7 +21,7 @@ module.exports = {
         await command.execute(interaction, client);
 
         // Logging
-        const logChannel = interaction.guild.channels.cache.get("1335994695070781491");
+        const logChannel = interaction.guild.channels.cache.get("1097819763020927027");
         if (logChannel) {
           const embed = new EmbedBuilder()
             .setColor("Blue")
@@ -37,7 +37,7 @@ module.exports = {
         }
       } catch (error) {
         console.error(error);
-        await interaction.reply({
+        return interaction.reply({
           content: "Terjadi kesalahan saat menjalankan command!",
           flags: 64,
         });
