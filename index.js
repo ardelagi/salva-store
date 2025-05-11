@@ -43,6 +43,9 @@ const eventFiles = fs
   .filter((file) => file.endsWith(".js"));
 const commandFolders = fs.readdirSync("./src/commands");
 
+console.log("[DEBUG] Token ditemukan?", !!process.env.token);
+console.log("[DEBUG] Token:", process.env.token?.slice(0, 5), "..."); // Tampilkan 5 karakter pertama token
+
 (async () => {
   for (file of functions) {
     require(`./src/functions/${file}`)(client);
