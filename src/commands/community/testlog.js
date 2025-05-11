@@ -31,6 +31,6 @@ module.exports = {
       console.warn("⚠️ LOG_CHANNEL_ID tidak diatur dalam .env");
     }
 
-    await interaction.reply({ content: "✅ Test log telah dikirim!", ephemeral: true });
+    await interaction.reply({ content: "test log telah dikirim", flags: 64 });
   }
 };
