@@ -24,9 +24,18 @@ module.exports = {
                 );
 
                 if (channels.size > 0) {
-                    const inviteChannel = channels.first();
-                    const inviteLink = await inviteChannel.createInvite({ maxAge: 0, maxUses: 0 });
-                    invite = `[Invite Link](${inviteLink.url})`;
+                    try {
+                        const inviteChannel = channels.first();
+                        const inviteLink = await inviteChannel.createInvite({ 
+                            maxAge: 0, 
+                            maxUses: 0,
+                            unique: true
+                        });
+                        invite = `[Invite Link](${inviteLink.url})`;
+                    } catch (inviteError) {
+                        console.error(`Gagal membuat invite untuk ${guild.name}:`, inviteError);
+                        invite = "Tidak dapat membuat invite (Error)";
+                    }
                 }
             } catch (error) {
                 console.error(`Gagal mendapatkan data untuk ${guild.name}:`, error);
