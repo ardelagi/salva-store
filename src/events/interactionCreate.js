@@ -39,7 +39,7 @@ module.exports = {
         console.error(error);
         await interaction.reply({
           content: "Terjadi kesalahan saat menjalankan command!",
-          ephemeral: true,
+          flags: 64,
         });
       }
     }
@@ -47,15 +47,15 @@ module.exports = {
     // Publish Announcement
     if (interaction.isButton() && interaction.customId === "publish_announcement") {
       const selected = interaction.message.components[0].components[0].data?.values?.[0];
-      if (!selected) return interaction.reply({ content: "Kamu belum memilih channel.", ephemeral: true });
+      if (!selected) return interaction.reply({ content: "Kamu belum memilih channel.", flags: 64 });
 
       const channel = await interaction.guild.channels.fetch(selected).catch(() => null);
       if (!channel || !channel.isTextBased()) {
-        return interaction.reply({ content: "Channel tidak valid.", ephemeral: true });
+        return interaction.reply({ content: "Channel tidak valid.", flags: 64 });
       }
 
       await channel.send({ content: `Pengumuman dari <@${interaction.user.id}>!` });
-      return interaction.reply({ content: "Pengumuman berhasil dikirim!", ephemeral: true });
+      return interaction.reply({ content: "Pengumuman berhasil dikirim!", flags: 64 });
     }
 
     // Open Embed Modal
@@ -99,7 +99,7 @@ module.exports = {
         content: "Embed disiapkan. Tekan 'Publish' untuk mengirim.",
         embeds: [embed],
         components: interaction.message.components,
-        ephemeral: true,
+        flags: 64,
       });
     }
 
@@ -109,16 +109,16 @@ module.exports = {
       const embed = interaction.message.embeds?.[0];
 
       if (!channelId || !embed) {
-        return interaction.reply({ content: "Embed atau channel belum dipilih.", ephemeral: true });
+        return interaction.reply({ content: "Embed atau channel belum dipilih.", flags: 64 });
       }
 
       const channel = await interaction.guild.channels.fetch(channelId).catch(() => null);
       if (!channel || !channel.isTextBased()) {
-        return interaction.reply({ content: "Channel tidak valid.", ephemeral: true });
+        return interaction.reply({ content: "Channel tidak valid.", flags: 64 });
       }
 
       await channel.send({ embeds: [embed] });
-      return interaction.reply({ content: "Embed berhasil dikirim!", ephemeral: true });
+      return interaction.reply({ content: "Embed berhasil dikirim!", flags: 64 });
     }
   },
 };

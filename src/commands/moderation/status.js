@@ -32,9 +32,13 @@ module.exports = {
 
     // Mengirim status pertama kali
     let message = await interaction.reply({
-      embeds: [updateEmbed()],
-      fetchReply: true, // Memastikan kita bisa mendapatkan objek pesan yang telah dikirim
-    });
+        content: 'Status bot...'
+      });
+      // atau jika butuh balasannya:
+      const reply = await interaction.reply({
+        content: 'Status bot...'
+      }); // Memastikan kita bisa mendapatkan objek pesan yang telah dikirim
+    
 
     // Mengupdate embed setiap 10 detik (real-time)
     const interval = setInterval(async () => {
