@@ -1,56 +1,45 @@
 const {
   SlashCommandBuilder,
-  ActionRowBuilder,
-  StringSelectMenuBuilder,
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
   ButtonBuilder,
   ButtonStyle,
-  EmbedBuilder,
+  ActionRowBuilder,
+  StringSelectMenuBuilder,
+  ChannelType,
+  PermissionFlagsBits,
 } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("embedbuilder")
-    .setDescription("Buat dan kirim embed ke channel yang dipilih"),
+    .setDescription("Buat embed dan kirim ke channel")
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 
   async execute(interaction) {
     const channels = interaction.guild.channels.cache
-      .filter(ch => ch.isTextBased() && ch.viewable)
-      .map(ch => ({
-        label: ch.name,
-        value: ch.id,
+      .filter(c => c.type === ChannelType.GuildText)
+      .map(c => ({
+        label: c.name,
+        value: c.id,
       }))
-      .slice(0, 25); // Max 25 select options
+      .slice(0, 25);
 
-    const selectMenu = new StringSelectMenuBuilder()
-      .setCustomId("select_embed_channel")
-      .setPlaceholder("Pilih channel tujuan")
-      .addOptions(channels);
+    const selectMenu = new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId("select_embed_channel")
+        .setPlaceholder("Pilih channel untuk embed")
+        .addOptions(channels)
+    );
 
-    const openModalBtn = new ButtonBuilder()
-      .setCustomId("open_embed_modal")
-      .setLabel("Buat Embed")
-      .setStyle(ButtonStyle.Primary);
-
-    const publishBtn = new ButtonBuilder()
-      .setCustomId("publish_embed")
-      .setLabel("Publish")
-      .setStyle(ButtonStyle.Success);
-
-    const row1 = new ActionRowBuilder().addComponents(selectMenu);
-    const row2 = new ActionRowBuilder().addComponents(openModalBtn, publishBtn);
-
-    const embed = new EmbedBuilder()
-      .setTitle("Embed Builder")
-      .setDescription("Gunakan tombol dan dropdown di bawah ini untuk membuat embed dan mengirimnya.")
-      .setColor("Purple");
+    const button = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("open_embed_modal")
+        .setLabel("Buat Embed")
+        .setStyle(ButtonStyle.Primary)
+    );
 
     await interaction.reply({
-      embeds: [embed],
-      components: [row1, row2],
-      flags: 64,
+      content: "Silakan pilih channel dan tekan 'Buat Embed'",
+      components: [selectMenu, button],
     });
   },
 };

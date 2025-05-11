@@ -4,46 +4,48 @@ const {
   StringSelectMenuBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ComponentType,
   EmbedBuilder,
+  ChannelType,
+  PermissionFlagsBits,
 } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("announcement")
-    .setDescription("Kirim pengumuman ke channel yang dipilih"),
+    .setDescription("Kirim pengumuman ke channel tertentu")
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 
   async execute(interaction) {
     const channels = interaction.guild.channels.cache
-      .filter(ch => ch.isTextBased() && ch.viewable)
-      .map(ch => ({
-        label: ch.name,
-        value: ch.id,
+      .filter(c => c.type === ChannelType.GuildText)
+      .map(c => ({
+        label: c.name,
+        value: c.id,
       }))
-      .slice(0, 25); // Discord limit 25 options
+      .slice(0, 25); // Discord hanya izinkan max 25 item
 
-    const selectMenu = new StringSelectMenuBuilder()
-      .setCustomId("select_announcement_channel")
-      .setPlaceholder("Pilih channel pengumuman")
-      .addOptions(channels);
+    const row = new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId("select_announcement_channel")
+        .setPlaceholder("Pilih channel pengumuman")
+        .addOptions(channels)
+    );
 
-    const publishButton = new ButtonBuilder()
-      .setCustomId("publish_announcement")
-      .setLabel("Publish")
-      .setStyle(ButtonStyle.Success);
-
-    const row1 = new ActionRowBuilder().addComponents(selectMenu);
-    const row2 = new ActionRowBuilder().addComponents(publishButton);
+    const publishBtn = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("publish_announcement")
+        .setLabel("Publish")
+        .setStyle(ButtonStyle.Success)
+    );
 
     const embed = new EmbedBuilder()
+      .setColor("Orange")
       .setTitle("Buat Pengumuman")
-      .setDescription("Silakan pilih channel tujuan dan tekan tombol 'Publish'")
-      .setColor("Orange");
+      .setDescription("Silakan pilih channel tujuan dan tekan tombol 'Publish'");
 
     await interaction.reply({
       embeds: [embed],
-      components: [row1, row2],
-      flags: 64,
+      components: [row, publishBtn],
     });
   },
 };
